@@ -1,6 +1,5 @@
-// Appliquer immédiatement le thème sauvegardé
 (function() {
-  const savedTheme = localStorage.getItem('portfolio_theme') || 'dark';
+  const savedTheme = sessionStorage.getItem('portfolio_theme') || 'dark';
   if (savedTheme === 'light') {
     document.body.classList.add('light-theme');
   } else {
@@ -8,15 +7,9 @@
   }
 })();
 
-// 1. CONFIGURATION DE L'API RAWG
-// Remplacer 'VOTRE_CLE_API_ICI' par votre clé RAWG.io pour charger les données réelles.
-const RAWG_API_KEY = '322fb41e740644ecb0e5198b589351b6';
-
-// Liste par défaut des jeux favoris du portfolio
 const DEFAULT_GAMES = {};
 let MY_GAMES = {};
 
-// GESTION DU PROFIL ET DE LA CONFIGURATION (Persistance DB Neon pure)
 const DEFAULT_PROFILE_DATA = {
   name: 'Mon Pseudo',
   title: '',
@@ -38,7 +31,6 @@ const DEFAULT_PROFILE_DATA = {
 
 let PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA);
 
-// Encodage Base64 du backend pour éviter d'exposer l'IP en clair dans le code source
 const getBackendUrl = () => atob('aHR0cDovLzMxLjIxNC4xNDEuMTg4OjIwMjQx');
 const BACKEND_URL = getBackendUrl();
 
@@ -295,34 +287,30 @@ let IS_ADMIN = false;
 let ADMIN_KEY = sessionStorage.getItem('portfolio_admin_key') || atob('cmlrZXIxMjM=');
 
 function initAdminMode() {
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   const sessionAuth = sessionStorage.getItem('portfolio_admin_session');
-  
-  if (isLocalhost) {
-    IS_ADMIN = true;
-  } else if (sessionAuth === 'true') {
+  if (sessionAuth === 'true') {
     IS_ADMIN = true;
   } else {
-    // Mode visiteur par défaut
     IS_ADMIN = false;
   }
-
   updateAdminVisibility();
 }
 
 function updateAdminVisibility() {
   const topLogoutBtn = document.getElementById('admin-logout-top-btn');
+  const addGameBtn = document.getElementById('open-add-game-btn');
+  const editProfBtn = document.getElementById('open-edit-profile-btn');
 
   if (IS_ADMIN) {
     document.body.classList.remove('visitor-mode');
-    if (topLogoutBtn) {
-      topLogoutBtn.style.display = 'inline-flex';
-    }
+    if (topLogoutBtn) topLogoutBtn.style.display = 'inline-flex';
+    if (addGameBtn) addGameBtn.style.display = 'inline-flex';
+    if (editProfBtn) editProfBtn.style.display = 'inline-flex';
   } else {
     document.body.classList.add('visitor-mode');
-    if (topLogoutBtn) {
-      topLogoutBtn.style.display = 'none';
-    }
+    if (topLogoutBtn) topLogoutBtn.style.display = 'none';
+    if (addGameBtn) addGameBtn.style.display = 'none';
+    if (editProfBtn) editProfBtn.style.display = 'none';
   }
 }
 
@@ -483,19 +471,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
 });
 
-// 4. LOGIQUE D'AFFICHAGE DU STATUT DE L'API RAWG
 function updateApiStatusIndicator() {
-  const isMock = !RAWG_API_KEY || RAWG_API_KEY === 'VOTRE_CLE_API_ICI';
-  const indicator = document.querySelector('.system-pill .pill-indicator.green');
   const pillText = document.querySelector('.system-pill');
-
-  if (isMock && pillText && indicator) {
-    indicator.className = 'pill-indicator purple';
-    pillText.innerHTML = `<span class="pill-indicator purple"></span>RAWG API: DEMO`;
-    pillText.setAttribute('title', 'Aucune clé API saisie. Mode démonstration activé.');
-  } else if (pillText && indicator) {
-    pillText.innerHTML = `<span class="pill-indicator green"></span>RAWG API: OK`;
-    pillText.setAttribute('title', 'Clé API RAWG détectée et connectée.');
+  if (pillText) {
+    pillText.innerHTML = `<span class="pill-indicator green"></span>API CLOUD: OK`;
+    pillText.setAttribute('title', 'Connecté à la base de données Cloud VPS.');
   }
 }
 
@@ -1395,6 +1375,10 @@ function initStartMenu() {
 
 // 12. FENÊTRE DE CONFIGURATION POUR AJOUTER UN JEU DYNAMIQUE
 function openAddGameWindow() {
+  if (!IS_ADMIN) {
+    showToast('Accès refusé. Mode administrateur requis.', 'error');
+    return;
+  }
   const container = document.getElementById('windows-container');
   if (!container) return;
 
@@ -1593,35 +1577,12 @@ function openAddGameWindow() {
 
     searchTimeout = setTimeout(async () => {
       try {
-        const isMock = !RAWG_API_KEY || RAWG_API_KEY === 'VOTRE_CLE_API_ICI';
-        if (isMock) {
-          // Filtrage mock local
-          let results = Object.keys(MOCK_GAMES_DATA)
-            .filter(slug => MOCK_GAMES_DATA[slug].name.toLowerCase().includes(query.toLowerCase()))
-            .map(slug => ({
-              slug,
-              name: MOCK_GAMES_DATA[slug].name,
-              background_image: MOCK_GAMES_DATA[slug].background_image
-            }));
-
-          // Si rien de trouvé, proposer de générer à la volée le jeu recherché
-          if (results.length === 0) {
-            results.push({
-              slug: query.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              name: query,
-              background_image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=150&q=80'
-            });
-          }
-          renderSearchResults(results);
+        const res = await fetch(`${BACKEND_URL}/api/rawg/games?search=${encodeURIComponent(query)}&page_size=5`);
+        if (res.ok) {
+          const data = await res.json();
+          renderSearchResults(data.results);
         } else {
-          // Appel API réel de recherche RAWG via le proxy VPS
-          const res = await fetch(`${BACKEND_URL}/api/rawg/games?search=${encodeURIComponent(query)}&page_size=5`);
-          if (res.ok) {
-            const data = await res.json();
-            renderSearchResults(data.results);
-          } else {
-            resultsList.innerHTML = '<div style="padding: 10px; color: var(--accent-red); font-size: 0.85rem; text-align: center;">Erreur API</div>';
-          }
+          resultsList.innerHTML = '<div style="padding: 10px; color: var(--accent-red); font-size: 0.85rem; text-align: center;">Erreur API</div>';
         }
       } catch (err) {
         console.error(err);
@@ -2157,6 +2118,10 @@ function generateStarRatingHTML(ratingStr) {
 
 // 15. FENETRE OS D'EDITION DU PROFIL, DES LIENS ET DU SETUP PC
 function openEditProfileWindow() {
+  if (!IS_ADMIN) {
+    showToast('Accès refusé. Mode administrateur requis.', 'error');
+    return;
+  }
   const container = document.getElementById('windows-container');
   if (!container) return;
 
