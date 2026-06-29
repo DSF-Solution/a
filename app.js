@@ -768,7 +768,7 @@ async function fetchGameInfo(slug) {
   }
 
   try {
-    const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=522f41e474044ecb2e5198b589351b6`);
+    const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=322fb41e740644ecb0e5198b589351b6`);
     if (!response || !response.ok) {
       throw new Error(`Erreur RAWG pour le slug: ${slug}`);
     }
@@ -1594,8 +1594,16 @@ function openAddGameWindow() {
     searchTimeout = setTimeout(async () => {
       try {
         let results = [];
+        let searchQuery = query;
+        const qLow = query.toLowerCase().trim();
+        if (qLow === 'gta') searchQuery = 'grand theft auto';
+        else if (qLow === 'gta v' || qLow === 'gtav' || qLow === 'gta 5' || qLow === 'gta5') searchQuery = 'grand theft auto v';
+        else if (qLow === 'csgo' || qLow === 'cs' || qLow === 'cs2') searchQuery = 'counter strike';
+        else if (qLow === 'cod') searchQuery = 'call of duty';
+        else if (qLow === 'mc') searchQuery = 'minecraft';
+
         try {
-          const res = await fetch(`https://api.rawg.io/api/games?key=522f41e474044ecb2e5198b589351b6&search=${encodeURIComponent(query)}&page_size=5`);
+          const res = await fetch(`https://api.rawg.io/api/games?key=322fb41e740644ecb0e5198b589351b6&search=${encodeURIComponent(searchQuery)}&page_size=5`);
           if (res && res.ok) {
             const data = await res.json();
             if (data.results && data.results.length > 0) {
@@ -1612,7 +1620,7 @@ function openAddGameWindow() {
             { slug: 'minecraft', name: 'Minecraft', background_image: 'https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=300&q=80' },
             { slug: 'elden-ring', name: 'Elden Ring', background_image: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?auto=format&fit=crop&w=300&q=80' }
           ];
-          results = popularMock.filter(g => g.name.toLowerCase().includes(query.toLowerCase()));
+          results = popularMock.filter(g => g.name.toLowerCase().includes(qLow) || g.slug.includes(qLow));
           if (results.length === 0) {
             results.push({
               slug: query.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
