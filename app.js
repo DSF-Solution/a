@@ -80,7 +80,7 @@ async function pushToNeonCloud(type, payload) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        query: 'INSERT INTO portfolio_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();',
+        query: 'INSERT INTO portfolio_store (id, data, updated_at) VALUES ($1, $2::jsonb, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();',
         params: [type, JSON.stringify(payload)]
       })
     });
