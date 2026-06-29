@@ -2444,6 +2444,117 @@ body.light-theme select option {
   color: #0f172a !important;
 }
 
+/* ==========================================
+   MOBILE RESPONSIVE DESIGN (Smartphone & Tablet)
+   ========================================== */
+@media (max-width: 900px) {
+  .hero-bento {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 0.75rem 0.75rem 80px 0.75rem !important;
+  }
+
+  .app-container {
+    padding: 0 !important;
+    gap: 1.5rem !important;
+  }
+
+  .header-nav {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .bento-card {
+    padding: 1.25rem !important;
+  }
+
+  .profile-header {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    gap: 1rem !important;
+  }
+
+  .profile-info {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .profile-socials {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  .social-btn {
+    flex: 1 1 calc(50% - 0.5rem) !important;
+    justify-content: center !important;
+    min-width: 110px !important;
+  }
+
+  .specs-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  .section-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .search-filter-wrapper {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .search-box, 
+  .custom-dropdown, 
+  .custom-dropdown-btn, 
+  .add-game-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .games-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .os-window {
+    width: 94vw !important;
+    max-width: 94vw !important;
+    left: 3vw !important;
+    top: 3vh !important;
+    max-height: 88vh !important;
+    border-radius: 18px !important;
+  }
+
+  .window-body {
+    padding: 1rem !important;
+  }
+
+  .taskbar-dock {
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    transform: none !important;
+    padding: 0.4rem 0.6rem !important;
+  }
+
+  .taskbar-clock {
+    display: none !important;
+  }
+}
+
 
 
 
