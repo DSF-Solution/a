@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1.5rem;
+      background-color: #0b0b10;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background Ambient Glows (Pure Red 255 0 0 Theme) */
+    .ambient-glow-1 {
+      position: absolute;
+      top: 20%;
+      left: 30%;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(255, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-glow-2 {
+      position: absolute;
+      bottom: 20%;
+      right: 30%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .admin-login-card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      padding: 3rem 2.25rem;
+      border-radius: 28px;
+      background: rgba(20, 5, 5, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 0, 0, 0.35);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1.75rem;
+    }
+
+    .admin-icon-glow {
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(255, 0, 0, 0.1) 100%);
+      border: 1.5px solid rgba(255, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff3333;
+      box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+    }
+
+    .admin-header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .admin-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .admin-subtitle {
+      font-size: 0.88rem;
+      color: #e2b6b6;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .admin-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .admin-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .admin-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      color: #ffffff;
+      font-size: 0.95rem;
+      text-align: center;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+    }
+
+    .admin-input::placeholder {
+      color: #b87c7c;
+    }
+
+    .admin-input:focus {
+      border-color: #ff0000;
+      background: rgba(255, 0, 0, 0.12);
+      box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.3);
+    }
+
+    .admin-submit-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+      color: #ffffff;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
+    }
+
+    .admin-submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255, 0, 0, 0.75);
+    }
+
+    .admin-submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .admin-back-link {
+      font-size: 0.85rem;
+      color: #b87c7c;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 10px;
+    }
+
+    .admin-back-link:hover {
+      color: #ffffff;
+      background: rgba(255, 42, 75, 0.15);
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="admin-login-card">
+    <div class="admin-icon-glow">
+      <i data-lucide="shield-check" style="width: 36px; height: 36px;"></i>
+    </div>
+
+    <div class="admin-header-text">
+      <h1 class="admin-title">Administration</h1>
+      <p class="admin-subtitle">Espace réservé à la gestion du site</p>
+    </div>
+
+    <form class="admin-form" id="admin-login-form" onsubmit="return false;">
+      <div class="admin-input-wrapper">
+        <input type="password" id="admin-password" class="admin-input" placeholder="Mot de passe secret..." autofocus
+          autocomplete="current-password">
+      </div>
+      <div class="error-msg" id="error-msg">Mot de passe incorrect. Réessayez.</div>
+      <button type="submit" class="admin-submit-btn" id="admin-btn">
+        <i data-lucide="key" style="width: 20px; height: 20px;"></i>
+        <span>Déverrouiller l'Administration</span>
+      </button>
+    </form>
+
+    <a href="index.html" class="admin-back-link">
+      <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+      <span>Retourner à la version publique</span>
+    </a>
+  </div>
+
+  <script>
+    if (window.lucide) window.lucide.createIcons();
+
+    const form = document.getElementById('admin-login-form');
+    const passInput = document.getElementById('admin-password');
+    const errorMsg = document.getElementById('error-msg');
+
+    form.addEventListener('submit', () => {
+      const pass = passInput.value.trim();
+      if (pass === 'riker123' || pass === '1234') {
+        sessionStorage.setItem('portfolio_admin_session', 'true');
+        localStorage.setItem('portfolio_admin_key', pass);
+        window.location.href = 'index.html';
+      } else {
+        errorMsg.style.display = 'block';
+        passInput.style.borderColor = '#f87171';
+        passInput.value = '';
+        setTimeout(() => {
+          passInput.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+        }, 2000);
+      }
+    });
+  </script>
+</body>
+
+</html>

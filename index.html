@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Vitrine & Gaming</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Lucide Icons CDN for sleek modern icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Clean high-tech mesh grid background handled in style.css -->
+
+  <main class="container">
+
+    <!-- TOP CONTROL BAR (Theme & Admin Badge) -->
+    <div class="top-control-bar" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-bottom: 1rem; width: 100%;">
+      <button class="admin-top-logout-btn" id="admin-logout-top-btn" title="Mode Administrateur Actif - Clic pour déconnecter" style="display: none; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 12px; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); color: #34d399; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">
+        <i data-lucide="unlock" style="width: 14px; height: 14px;"></i>
+        <span>Mode Admin (Déconnexion)</span>
+      </button>
+
+      <button class="top-theme-toggle" id="theme-toggle-btn" title="Changer de thème (Sombre/Clair)" aria-label="Changer de thème">
+        <i data-lucide="moon" id="theme-icon"></i>
+      </button>
+    </div>
+
+    <!-- HEADER BENTO GRID -->
+    <header class="bento-header">
+
+      <!-- Card 1: Profile & Identity (spans 2 columns on desktop) -->
+      <section class="bento-card profile-card" style="position: relative;">
+        <button class="edit-profile-btn" id="open-edit-profile-btn" onclick="openEditProfileWindow()" title="Modifier le profil & liens" aria-label="Modifier le profil">
+          <i data-lucide="edit-3"></i>
+          <span>Modifier</span>
+        </button>
+
+        <div class="profile-header">
+          <div class="avatar-container">
+            <!-- Simulated avatar image or premium generated avatar -->
+            <div class="avatar-glow"></div>
+            <img
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80"
+              alt="Avatar" class="avatar-img" id="avatar-img">
+            <span class="status-badge online" id="status-badge" title="Disponible pour de nouveaux projets">
+              <span class="pulse-dot"></span>
+              <span id="status-text">En Ligne</span>
+            </span>
+          </div>
+          <div class="profile-info">
+            <h1 class="profile-name" id="profile-name">RikerFr</h1>
+            <p class="profile-title" id="profile-title">Développeur Front-End & UI/UX Designer</p>
+          </div>
+        </div>
+
+        <p class="profile-bio" id="profile-bio">
+          Passionné par la création d'interfaces utilisateur modernes, fluides et interactives. Je combine l'esthétique
+          du design moderne avec du code Vanilla robuste pour concevoir des expériences web mémorables.
+        </p>
+
+        <div class="profile-socials" id="profile-socials">
+          <a href="https://github.com" target="_blank" class="social-btn" aria-label="GitHub">
+            <i data-lucide="github"></i>
+            <span>GitHub</span>
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="social-btn" aria-label="LinkedIn">
+            <i data-lucide="linkedin"></i>
+            <span>LinkedIn</span>
+          </a>
+          <a href="https://twitch.tv" target="_blank" class="social-btn" aria-label="Twitch">
+            <i data-lucide="twitch"></i>
+            <span>Twitch</span>
+          </a>
+          <a href="mailto:contact@example.com" class="social-btn" aria-label="Email">
+            <i data-lucide="mail"></i>
+            <span>Contact</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Card 2: PC Configuration Setup -->
+      <section class="bento-card pc-setup-card" style="position: relative;">
+        <button class="edit-profile-btn" onclick="openEditProfileWindow()" title="Modifier la configuration PC" aria-label="Modifier la configuration" style="padding: 5px 10px; font-size: 0.75rem;">
+          <i data-lucide="edit-2"></i>
+        </button>
+        <div class="card-header">
+          <i data-lucide="cpu" class="card-icon setup-icon"></i>
+          <h2 class="card-title">Configuration PC</h2>
+        </div>
+
+        <div class="specs-list">
+          <div class="spec-item">
+            <div class="spec-label">
+              <span class="spec-dot"></span>
+              <span>GPU</span>
+            </div>
+            <div class="spec-value highlight-gpu" id="spec-gpu">NVIDIA RTX 4070 Super</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">
+              <span class="spec-dot"></span>
+              <span>CPU</span>
+            </div>
+            <div class="spec-value" id="spec-cpu">AMD Ryzen 7 7800X3D</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">
+              <span class="spec-dot"></span>
+              <span>RAM / SSD</span>
+            </div>
+            <div class="spec-value" id="spec-ram-ssd">32 Go DDR5 / 2 To NVMe</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">
+              <span class="spec-dot"></span>
+              <span>Carte Mère</span>
+            </div>
+            <div class="spec-value" id="spec-mobo">ASUS ROG Strix B650-A</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">
+              <span class="spec-dot"></span>
+              <span>Refroidissement</span>
+            </div>
+            <div class="spec-value" id="spec-cooler">Watercooling 360mm RGB</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">
+              <span class="spec-dot"></span>
+              <span>Boîtier / Alim</span>
+            </div>
+            <div class="spec-value" id="spec-case">NZXT H7 Flow / 850W Gold</div>
+          </div>
+        </div>
+      </section>
+
+    </header>
+
+    <!-- GAMES SECTION -->
+    <section class="games-section">
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <i data-lucide="gamepad-2" class="section-icon"></i>
+          <div>
+            <h2 class="section-title">Jeux</h2>
+          </div>
+        </div>
+        <div class="search-filter-wrapper" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <!-- Simple interactive filters (handled in JS) -->
+          <div class="search-box">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="game-search" placeholder="Rechercher un jeu...">
+          </div>
+          <div class="custom-dropdown" id="game-sort-dropdown">
+            <button class="custom-dropdown-btn" id="sort-dropdown-btn" type="button" aria-label="Trier les jeux">
+              <i data-lucide="arrow-up-down" class="dropdown-icon-left"></i>
+              <span id="sort-current-label">Derniers ajoutés</span>
+              <i data-lucide="chevron-down" class="dropdown-icon-right"></i>
+            </button>
+            <div class="custom-dropdown-menu" id="sort-dropdown-menu">
+              <div class="dropdown-item active" data-value="recent">
+                <i data-lucide="clock" class="item-icon"></i>
+                <span>Derniers ajoutés</span>
+                <i data-lucide="check" class="check-icon"></i>
+              </div>
+              <div class="dropdown-item" data-value="alpha">
+                <i data-lucide="sort-asc" class="item-icon"></i>
+                <span>Ordre alphabétique</span>
+                <i data-lucide="check" class="check-icon"></i>
+              </div>
+              <div class="dropdown-item" data-value="rating">
+                <i data-lucide="star" class="item-icon"></i>
+                <span>Meilleures notes</span>
+                <i data-lucide="check" class="check-icon"></i>
+              </div>
+            </div>
+            <input type="hidden" id="game-sort-select" value="recent">
+          </div>
+          <button class="add-game-btn" id="open-add-game-btn" title="Ajouter un jeu au portfolio">
+            <i data-lucide="plus"></i>
+            <span>Ajouter</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Games Bento Grid -->
+      <div class="games-grid" id="games-grid">
+        <!-- Dynamically populated via app.js -->
+        <div class="loading-state" id="loading-state">
+          <div class="spinner"></div>
+          <p>Récupération des jeux...</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- WINDOWS CONTAINER (For modal popup windows) -->
+  <div class="windows-container" id="windows-container"></div>
+
+  <!-- App Logic -->
+  <script src="app.js"></script>
+</body>
+
+</html>
