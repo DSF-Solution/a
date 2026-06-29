@@ -37,23 +37,25 @@ const BACKEND_URL = getBackendUrl();
 // Synchronisation automatique avec la base de données Cloud Neon
 async function syncWithNeonCloud() {
   let loaded = false;
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/portfolio`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && data.store) {
-        if (data.store.profile) {
-          PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, data.store.profile);
-          renderProfileData();
+  if (window.location.protocol !== 'https:' || BACKEND_URL.startsWith('https:')) {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/portfolio`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.store) {
+          if (data.store.profile) {
+            PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, data.store.profile);
+            renderProfileData();
+          }
+          if (data.store.games) {
+            MY_GAMES = data.store.games;
+            loadGamesGrid();
+          }
+          loaded = true;
         }
-        if (data.store.games) {
-          MY_GAMES = data.store.games;
-          loadGamesGrid();
-        }
-        loaded = true;
       }
-    }
-  } catch (err) {}
+    } catch (err) {}
+  }
 
   if (!loaded) {
     try {
@@ -72,6 +74,10 @@ async function pushToNeonCloud(type, payload) {
     if (type === 'profile') localStorage.setItem('my_portfolio_profile', JSON.stringify(payload));
     if (type === 'games') localStorage.setItem('my_games_portfolio', JSON.stringify(payload));
   } catch(e){}
+
+  if (window.location.protocol === 'https:' && BACKEND_URL.startsWith('http:')) {
+    return;
+  }
 
   try {
     await fetch(`${BACKEND_URL}/api/portfolio`, {
