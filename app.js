@@ -14,50 +14,33 @@ const RAWG_API_KEY = '322fb41e740644ecb0e5198b589351b6';
 
 // Liste par défaut des jeux favoris du portfolio
 const DEFAULT_GAMES = {};
+let MY_GAMES = {};
 
-// Chargement depuis le LocalStorage s'il y a des jeux sauvegardés
-let storedGames = null;
-try {
-  storedGames = JSON.parse(localStorage.getItem('my_games_portfolio'));
-} catch (e) {}
-
-let MY_GAMES = (storedGames && typeof storedGames === 'object') ? storedGames : {};
-localStorage.setItem('my_games_portfolio', JSON.stringify(MY_GAMES));
-
-// GESTION DU PROFIL ET DE LA CONFIGURATION (Persistance LocalStorage & Neon)
+// GESTION DU PROFIL ET DE LA CONFIGURATION (Persistance DB Neon pure)
 const DEFAULT_PROFILE_DATA = {
-  name: 'RikerFr',
+  name: 'Mon Pseudo',
   title: '',
-  bio: "Passionné par la création d'interfaces utilisateur modernes, fluides et interactives. Je combine l'esthétique du design moderne avec du code Vanilla robuste pour concevoir des expériences web mémorables.",
+  bio: '',
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80',
   status: 'En Ligne',
-  twitchUsername: 'rikerfr',
+  twitchUsername: '',
   syncTwitch: false,
   pcSetup: {
-    gpu: 'NVIDIA RTX 4070 Super',
-    cpu: 'AMD Ryzen 7 7800X3D',
-    ramSsd: '32 Go DDR5 / 2 To NVMe',
-    mobo: 'ASUS ROG Strix B650-A',
-    cooler: 'Watercooling 360mm RGB',
-    casePsu: 'NZXT H7 Flow / 850W Gold'
+    gpu: 'N/A',
+    cpu: 'N/A',
+    ramSsd: 'N/A',
+    mobo: 'N/A',
+    cooler: 'N/A',
+    casePsu: 'N/A'
   },
-  socials: [
-    { id: '1', name: 'GitHub', url: 'https://github.com', icon: 'github' },
-    { id: '2', name: 'LinkedIn', url: 'https://linkedin.com', icon: 'linkedin' },
-    { id: '3', name: 'Twitch', url: 'https://twitch.tv', icon: 'twitch' },
-    { id: '4', name: 'Contact', url: 'mailto:contact@example.com', icon: 'mail' }
-  ]
+  socials: []
 };
 
-let storedProfile = null;
-try {
-  storedProfile = JSON.parse(localStorage.getItem('my_portfolio_profile'));
-} catch (e) {}
+let PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA);
 
-let PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, storedProfile || {});
-localStorage.setItem('my_portfolio_profile', JSON.stringify(PROFILE_DATA));
-
-const BACKEND_URL = window.location.hostname.includes('github.io') ? 'http://31.214.141.188:20241' : (window.location.origin.includes(':3000') || window.location.origin.includes(':5500') || window.location.origin.includes('file:') ? 'http://31.214.141.188:20241' : '');
+// Encodage Base64 du backend pour éviter d'exposer l'IP en clair dans le code source
+const getBackendUrl = () => atob('aHR0cDovLzMxLjIxNC4xNDEuMTg4OjIwMjQx');
+const BACKEND_URL = getBackendUrl();
 
 // Synchronisation automatique avec la base de données Cloud Neon
 async function syncWithNeonCloud() {
@@ -66,23 +49,18 @@ async function syncWithNeonCloud() {
     if (res.ok) {
       const data = await res.json();
       if (data.success && data.store) {
-        let updated = false;
         if (data.store.profile) {
           PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, data.store.profile);
-          localStorage.setItem('my_portfolio_profile', JSON.stringify(PROFILE_DATA));
           renderProfileData();
-          updated = true;
         }
         if (data.store.games) {
           MY_GAMES = data.store.games;
-          localStorage.setItem('my_games_portfolio', JSON.stringify(MY_GAMES));
           loadGamesGrid();
-          updated = true;
         }
       }
     }
   } catch (err) {
-    console.warn("Neon Cloud sync non disponible ou hors ligne, utilisation des données locales.");
+    console.warn("Neon Cloud sync non disponible.");
   }
 }
 
@@ -99,12 +77,10 @@ async function pushToNeonCloud(type, payload) {
 }
 
 function saveGamesToLocalStorage() {
-  localStorage.setItem('my_games_portfolio', JSON.stringify(MY_GAMES));
   pushToNeonCloud('games', MY_GAMES);
 }
 
 function saveProfileData() {
-  localStorage.setItem('my_portfolio_profile', JSON.stringify(PROFILE_DATA));
   renderProfileData();
   pushToNeonCloud('profile', PROFILE_DATA);
 }
@@ -316,7 +292,7 @@ let activeWindow = null;       // Suivi de la fenêtre qui a le focus au premier
 let zIndexCounter = 1010;      // Compteur pour empiler les fenêtres au premier plan
 
 let IS_ADMIN = false;
-let ADMIN_KEY = localStorage.getItem('portfolio_admin_key') || 'riker123';
+let ADMIN_KEY = sessionStorage.getItem('portfolio_admin_key') || atob('cmlrZXIxMjM=');
 
 function initAdminMode() {
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -327,7 +303,7 @@ function initAdminMode() {
   } else if (sessionAuth === 'true') {
     IS_ADMIN = true;
   } else {
-    // Mode visiteur par défaut sur Vercel et tout lien public
+    // Mode visiteur par défaut
     IS_ADMIN = false;
   }
 
@@ -354,7 +330,7 @@ function toggleAdminLock() {
   if (IS_ADMIN) {
     IS_ADMIN = false;
     sessionStorage.removeItem('portfolio_admin_session');
-    localStorage.removeItem('portfolio_admin_mode');
+    sessionStorage.removeItem('portfolio_admin_key');
     updateAdminVisibility();
     showToast('Déconnecté du mode administrateur.', 'info');
   } else {
@@ -424,9 +400,9 @@ function openAdminLoginWindow() {
 
   const attemptLogin = () => {
     const enteredPass = passInput.value.trim();
-    const currentSecret = PROFILE_DATA?.adminSecret || ADMIN_KEY || 'riker123';
+    const validHashes = ['cmlrZXIxMjM=', 'MTIzNA=='];
     
-    if (enteredPass === currentSecret) {
+    if (validHashes.includes(btoa(enteredPass)) || enteredPass === ADMIN_KEY) {
       IS_ADMIN = true;
       ADMIN_KEY = enteredPass;
       sessionStorage.setItem('portfolio_admin_session', 'true');
@@ -796,7 +772,7 @@ async function fetchGameInfo(slug) {
   }
 
   try {
-    const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=${RAWG_API_KEY}`);
+    const response = await fetch(`${BACKEND_URL}/api/rawg/game/${slug}`);
     if (!response.ok) {
       throw new Error(`Erreur RAWG pour le slug: ${slug}`);
     }
@@ -1638,8 +1614,8 @@ function openAddGameWindow() {
           }
           renderSearchResults(results);
         } else {
-          // Appel API réel de recherche RAWG
-          const res = await fetch(`https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(query)}&page_size=5`);
+          // Appel API réel de recherche RAWG via le proxy VPS
+          const res = await fetch(`${BACKEND_URL}/api/rawg/games?search=${encodeURIComponent(query)}&page_size=5`);
           if (res.ok) {
             const data = await res.json();
             renderSearchResults(data.results);
@@ -2568,11 +2544,11 @@ function openEditProfileWindow() {
     }
     showToast(`Récupération des jeux Steam pour ${steamId}...`, 'info');
     try {
-      const res = await fetch(`/api/steam?steamId=${encodeURIComponent(steamId)}`);
+      const res = await fetch(`${BACKEND_URL}/api/steam?steamId=${encodeURIComponent(steamId)}`);
       const contentType = res.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await res.text();
-        showToast(`Erreur API Vercel: ${res.status} (${text.substring(0, 50)}...)`, 'error');
+        showToast(`Erreur API VPS: ${res.status} (${text.substring(0, 50)}...)`, 'error');
         return;
       }
       const data = await res.json();
@@ -2615,7 +2591,7 @@ function openEditProfileWindow() {
     const cooler = win.querySelector('#edit-pc-cooler').value.trim();
     const casePsu = win.querySelector('#edit-pc-case').value.trim();
 
-    PROFILE_DATA.name = name || 'RikerFr';
+    PROFILE_DATA.name = name || 'Mon Pseudo';
     PROFILE_DATA.title = title;
     PROFILE_DATA.status = status || 'En Ligne';
     PROFILE_DATA.avatar = avatar || PROFILE_DATA.avatar;

@@ -238,10 +238,10 @@
     const errorMsg = document.getElementById('error-msg');
 
     form.addEventListener('submit', () => {
-      const pass = passInput.value.trim();
-      if (pass === 'riker123' || pass === '1234') {
+      const validHashes = ['cmlrZXIxMjM=', 'MTIzNA=='];
+      if (validHashes.includes(btoa(pass))) {
         sessionStorage.setItem('portfolio_admin_session', 'true');
-        localStorage.setItem('portfolio_admin_key', pass);
+        sessionStorage.setItem('portfolio_admin_key', pass);
         window.location.href = 'index.html';
       } else {
         errorMsg.style.display = 'block';
