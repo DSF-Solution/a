@@ -580,7 +580,7 @@ body {
   font-family: var(--font-sans) !important;
   font-size: 0.85rem !important;
   font-weight: 700 !important;
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center !important;
   gap: 8px !important;
   cursor: pointer !important;
@@ -2228,8 +2228,10 @@ body.light-theme .edit-profile-btn:hover {
 }
 
 /* Visitor / Read-Only Mode (Hides all editing controls for subscribers) */
-body.visitor-mode .edit-profile-btn,
+body.visitor-mode #open-add-game-btn,
 body.visitor-mode .add-game-btn,
+body.visitor-mode #open-edit-profile-btn,
+body.visitor-mode .edit-profile-btn,
 body.visitor-mode .card-delete-btn,
 body.visitor-mode .btn-edit-game,
 body.visitor-mode .btn-delete-game,
