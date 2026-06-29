@@ -34,67 +34,72 @@ let PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA);
 const getBackendUrl = () => atob('aHR0cDovLzMxLjIxNC4xNDEuMTg4OjIwMjQx');
 const BACKEND_URL = getBackendUrl();
 
+const NEON_DB_URL = "postgresql://neondb_owner:npg_jmMX3IQLig1J@ep-old-hall-as27su83-pooler.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require";
+const NEON_API_URL = "https://api.c-4.eu-central-1.aws.neon.tech/sql";
+
 // Synchronisation automatique avec la base de données Cloud Neon
 async function syncWithNeonCloud() {
-  let loaded = false;
-  if (window.location.protocol !== 'https:' || BACKEND_URL.startsWith('https:')) {
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/portfolio`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.store) {
-          if (data.store.profile) {
-            PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, data.store.profile);
-            renderProfileData();
-          }
-          if (data.store.games) {
-            MY_GAMES = data.store.games;
-            loadGamesGrid();
-          }
-          loaded = true;
+  try {
+    const res = await fetch(NEON_API_URL, {
+      method: 'POST',
+      headers: {
+        'Neon-Connection-String': NEON_DB_URL,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: 'SELECT id, data FROM portfolio_store;',
+        params: []
+      })
+    });
+    if (res.ok) {
+      const result = await res.json();
+      if (result && result.rows) {
+        const profileRow = result.rows.find(r => r.id === 'profile');
+        const gamesRow = result.rows.find(r => r.id === 'games');
+        if (profileRow && profileRow.data) {
+          PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, profileRow.data);
+          renderProfileData();
+        }
+        if (gamesRow && gamesRow.data) {
+          MY_GAMES = gamesRow.data;
+          loadGamesGrid();
         }
       }
-    } catch (err) {}
-  }
-
-  if (!loaded) {
-    try {
-      const localProf = localStorage.getItem('my_portfolio_profile');
-      if (localProf) PROFILE_DATA = Object.assign({}, DEFAULT_PROFILE_DATA, JSON.parse(localProf));
-      renderProfileData();
-      const localGames = localStorage.getItem('my_games_portfolio');
-      if (localGames) MY_GAMES = JSON.parse(localGames);
-      loadGamesGrid();
-    } catch(e){}
+    }
+  } catch (err) {
+    console.error('Erreur lors du chargement depuis Neon Cloud:', err);
   }
 }
 
 async function pushToNeonCloud(type, payload) {
   try {
-    if (type === 'profile') localStorage.setItem('my_portfolio_profile', JSON.stringify(payload));
-    if (type === 'games') localStorage.setItem('my_games_portfolio', JSON.stringify(payload));
-  } catch(e){}
-
-  if (window.location.protocol === 'https:' && BACKEND_URL.startsWith('http:')) {
-    return;
-  }
-
-  try {
-    await fetch(`${BACKEND_URL}/api/portfolio`, {
+    const res = await fetch(NEON_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, data: payload, adminKey: ADMIN_KEY })
+      headers: {
+        'Neon-Connection-String': NEON_DB_URL,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: 'INSERT INTO portfolio_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();',
+        params: [type, JSON.stringify(payload)]
+      })
     });
-  } catch (err) {}
+    if (res.ok) {
+      showToast('Sauvegardé avec succès dans la base de données !', 'success');
+    } else {
+      showToast('Erreur lors de la sauvegarde dans la base de données.', 'error');
+    }
+  } catch (err) {
+    console.error('Erreur de sauvegarde dans la base de données:', err);
+    showToast('Erreur de connexion avec la base de données.', 'error');
+  }
 }
 
 function saveGamesToLocalStorage() {
-  try { localStorage.setItem('my_games_portfolio', JSON.stringify(MY_GAMES)); } catch(e){}
   pushToNeonCloud('games', MY_GAMES);
 }
 
 function saveProfileData() {
-  try { localStorage.setItem('my_portfolio_profile', JSON.stringify(PROFILE_DATA)); } catch(e){}
   renderProfileData();
   pushToNeonCloud('profile', PROFILE_DATA);
 }
