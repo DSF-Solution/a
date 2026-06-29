@@ -715,7 +715,10 @@ async function translateToFrench(text) {
   const textToTranslate = getCleanExcerpt(englishOnly, 450);
   
   try {
-    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=en|fr`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=en|fr`, { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (response.ok) {
       const data = await response.json();
       if (data.responseData && data.responseData.translatedText) {
@@ -726,9 +729,7 @@ async function translateToFrench(text) {
         }
       }
     }
-  } catch (error) {
-    console.error('Erreur lors de la traduction:', error);
-  }
+  } catch (error) {}
   
   // En cas d'échec de la traduction, renvoyer l'extrait d'origine en anglais
   return textToTranslate;
@@ -792,7 +793,7 @@ async function fetchGameInfo(slug) {
     let gameDesc = baseMock.description;
     if (data?.description) {
       const cleaned = cleanHtmlDescription(data.description);
-      gameDesc = extractFrenchDescription(cleaned) || await translateToFrench(cleaned);
+      gameDesc = extractFrenchDescription(cleaned) || cleanDescriptionOfOtherLanguages(cleaned);
     }
 
     return {
