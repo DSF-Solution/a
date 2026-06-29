@@ -768,17 +768,25 @@ async function fetchGameInfo(slug) {
   }
 
   try {
-    const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=322fb41e740644ecb0e5198b589351b6`);
-    if (!response || !response.ok) {
-      throw new Error(`Erreur RAWG pour le slug: ${slug}`);
-    }
-    const data = await response.json();
+    let data = null;
+    try {
+      const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=322fb41e740644ecb0e5198b589351b6`);
+      if (response && response.ok) {
+        data = await response.json();
+      }
+    } catch(e) {}
 
-    // Traiter la description pour qu'elle soit en Français
-    const fullDesc = cleanHtmlDescription(data.description) || 'Aucune description disponible.';
-    let frenchDesc = extractFrenchDescription(fullDesc);
-    if (!frenchDesc) {
-      frenchDesc = await translateToFrench(fullDesc);
+    const baseMock = MOCK_GAMES_DATA[slug] || generateFallbackMock(slug);
+    const gameName = MY_GAMES[slug]?.name || data?.name || baseMock.name;
+    const gameBg = customImage || MY_GAMES[slug]?.background_image || data?.background_image || baseMock.background_image;
+    const gameRating = data?.rating || baseMock.rating || '4.5';
+    const gameReleased = customReleased || (data?.released ? new Date(data.released).getFullYear() : baseMock.released);
+    const gameGenres = customGenres || (data?.genres ? data.genres.map(g => g.name).join(', ') : baseMock.genres);
+    const gamePlatforms = customPlatforms || (data?.platforms ? data.platforms.map(p => p.platform.name).join(', ') : baseMock.platforms);
+    let gameDesc = baseMock.description;
+    if (data?.description) {
+      const cleaned = cleanHtmlDescription(data.description);
+      gameDesc = extractFrenchDescription(cleaned) || await translateToFrench(cleaned);
     }
 
     return {
@@ -786,29 +794,31 @@ async function fetchGameInfo(slug) {
       myRating: myRating,
       dejaJoue: dejaJoue,
       myComment: myComment,
+      addedAt: addedAt,
       customImage: customImage,
-      name: data.name,
-      background_image: customImage || data.background_image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-      rating: data.rating || 'N/A',
-      released: customReleased || (data.released ? new Date(data.released).getFullYear() : 'N/A'),
-      genres: customGenres || (data.genres ? data.genres.map(g => g.name).join(', ') : 'Action'),
-      platforms: customPlatforms || (data.platforms ? data.platforms.map(p => p.platform.name).join(', ') : 'PC'),
-      description: frenchDesc
+      name: gameName,
+      background_image: gameBg,
+      rating: gameRating,
+      released: gameReleased,
+      genres: gameGenres,
+      platforms: gamePlatforms,
+      description: gameDesc
     };
-  } catch (error) {
-    console.warn(`Impossible de récupérer ${slug} depuis RAWG, bascule sur la démo locale.`, error);
+  } catch (err) {
     const baseMock = MOCK_GAMES_DATA[slug] || generateFallbackMock(slug);
     return {
       slug: slug,
       myRating: myRating,
       dejaJoue: dejaJoue,
       myComment: myComment,
-      customImage: customImage,
-      platforms: customPlatforms || baseMock.platforms || 'PC, PS5, Xbox Series X/S',
-      released: customReleased || baseMock.released || 'N/A',
-      genres: customGenres || baseMock.genres || 'Action',
-      ...baseMock,
-      background_image: customImage || baseMock.background_image
+      addedAt: addedAt,
+      name: MY_GAMES[slug]?.name || baseMock.name,
+      background_image: customImage || MY_GAMES[slug]?.background_image || baseMock.background_image,
+      rating: '4.5',
+      released: 'N/A',
+      genres: 'Jeux',
+      platforms: 'PC',
+      description: 'Détails du jeu.'
     };
   }
 }
@@ -1688,6 +1698,10 @@ function openAddGameWindow() {
 
     // Enregistrer dans l'objet global
     MY_GAMES[selectedSlug] = { 
+      slug: selectedSlug,
+      name: selectedTitle,
+      background_image: selectedImg,
+      customImage: selectedImg,
       myRating: rating,
       myComment: comment,
       dejaJoue: dejaJoue,
