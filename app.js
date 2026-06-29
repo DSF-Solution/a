@@ -768,12 +768,7 @@ async function fetchGameInfo(slug) {
   }
 
   try {
-    let response;
-    try {
-      response = await fetch(`${BACKEND_URL}/api/rawg/game/${slug}`);
-    } catch(e) {
-      response = await fetch(`https://api.rawg.io/api/games/${slug}?key=522f41e474044ecb2e5198b589351b6`);
-    }
+    const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=522f41e474044ecb2e5198b589351b6`);
     if (!response || !response.ok) {
       throw new Error(`Erreur RAWG pour le slug: ${slug}`);
     }
@@ -1598,12 +1593,7 @@ function openAddGameWindow() {
 
     searchTimeout = setTimeout(async () => {
       try {
-        let res;
-        try {
-          res = await fetch(`${BACKEND_URL}/api/rawg/games?search=${encodeURIComponent(query)}&page_size=5`);
-        } catch(netErr) {
-          res = await fetch(`https://api.rawg.io/api/games?key=522f41e474044ecb2e5198b589351b6&search=${encodeURIComponent(query)}&page_size=5`);
-        }
+        const res = await fetch(`https://api.rawg.io/api/games?key=522f41e474044ecb2e5198b589351b6&search=${encodeURIComponent(query)}&page_size=5`);
         if (res && res.ok) {
           const data = await res.json();
           renderSearchResults(data.results);
