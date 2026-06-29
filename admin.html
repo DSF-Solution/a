@@ -238,6 +238,7 @@
     const errorMsg = document.getElementById('error-msg');
 
     form.addEventListener('submit', () => {
+      const pass = passInput.value.trim();
       const validHashes = ['cmlrZXIxMjM=', 'MTIzNA=='];
       if (validHashes.includes(btoa(pass))) {
         sessionStorage.setItem('portfolio_admin_session', 'true');

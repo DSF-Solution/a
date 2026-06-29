@@ -42,7 +42,7 @@
 
       <!-- Card 1: Profile & Identity (spans 2 columns on desktop) -->
       <section class="bento-card profile-card" style="position: relative;">
-        <button class="edit-profile-btn" id="open-edit-profile-btn" onclick="openEditProfileWindow()" title="Modifier le profil & liens" aria-label="Modifier le profil">
+        <button class="edit-profile-btn" id="open-edit-profile-btn" onclick="openEditProfileWindow()" title="Modifier le profil & liens" aria-label="Modifier le profil" style="display: none;">
           <i data-lucide="edit-3"></i>
           <span>Modifier</span>
         </button>
@@ -60,39 +60,19 @@
             </span>
           </div>
           <div class="profile-info">
-            <h1 class="profile-name" id="profile-name">RikerFr</h1>
-            <p class="profile-title" id="profile-title">Développeur Front-End & UI/UX Designer</p>
+            <h1 class="profile-name" id="profile-name">Mon Pseudo</h1>
+            <p class="profile-title" id="profile-title"></p>
           </div>
         </div>
 
-        <p class="profile-bio" id="profile-bio">
-          Passionné par la création d'interfaces utilisateur modernes, fluides et interactives. Je combine l'esthétique
-          du design moderne avec du code Vanilla robuste pour concevoir des expériences web mémorables.
-        </p>
+        <p class="profile-bio" id="profile-bio"></p>
 
-        <div class="profile-socials" id="profile-socials">
-          <a href="https://github.com" target="_blank" class="social-btn" aria-label="GitHub">
-            <i data-lucide="github"></i>
-            <span>GitHub</span>
-          </a>
-          <a href="https://linkedin.com" target="_blank" class="social-btn" aria-label="LinkedIn">
-            <i data-lucide="linkedin"></i>
-            <span>LinkedIn</span>
-          </a>
-          <a href="https://twitch.tv" target="_blank" class="social-btn" aria-label="Twitch">
-            <i data-lucide="twitch"></i>
-            <span>Twitch</span>
-          </a>
-          <a href="mailto:contact@example.com" class="social-btn" aria-label="Email">
-            <i data-lucide="mail"></i>
-            <span>Contact</span>
-          </a>
-        </div>
+        <div class="profile-socials" id="profile-socials"></div>
       </section>
 
       <!-- Card 2: PC Configuration Setup -->
       <section class="bento-card pc-setup-card" style="position: relative;">
-        <button class="edit-profile-btn" onclick="openEditProfileWindow()" title="Modifier la configuration PC" aria-label="Modifier la configuration" style="padding: 5px 10px; font-size: 0.75rem;">
+        <button class="edit-profile-btn" onclick="openEditProfileWindow()" title="Modifier la configuration PC" aria-label="Modifier la configuration" style="padding: 5px 10px; font-size: 0.75rem; display: none;">
           <i data-lucide="edit-2"></i>
         </button>
         <div class="card-header">
@@ -106,7 +86,7 @@
               <span class="spec-dot"></span>
               <span>GPU</span>
             </div>
-            <div class="spec-value highlight-gpu" id="spec-gpu">NVIDIA RTX 4070 Super</div>
+            <div class="spec-value highlight-gpu" id="spec-gpu">N/A</div>
           </div>
 
           <div class="spec-item">
@@ -114,7 +94,7 @@
               <span class="spec-dot"></span>
               <span>CPU</span>
             </div>
-            <div class="spec-value" id="spec-cpu">AMD Ryzen 7 7800X3D</div>
+            <div class="spec-value" id="spec-cpu">N/A</div>
           </div>
 
           <div class="spec-item">
@@ -122,7 +102,7 @@
               <span class="spec-dot"></span>
               <span>RAM / SSD</span>
             </div>
-            <div class="spec-value" id="spec-ram-ssd">32 Go DDR5 / 2 To NVMe</div>
+            <div class="spec-value" id="spec-ram-ssd">N/A</div>
           </div>
 
           <div class="spec-item">
@@ -130,7 +110,7 @@
               <span class="spec-dot"></span>
               <span>Carte Mère</span>
             </div>
-            <div class="spec-value" id="spec-mobo">ASUS ROG Strix B650-A</div>
+            <div class="spec-value" id="spec-mobo">N/A</div>
           </div>
 
           <div class="spec-item">
@@ -138,7 +118,7 @@
               <span class="spec-dot"></span>
               <span>Refroidissement</span>
             </div>
-            <div class="spec-value" id="spec-cooler">Watercooling 360mm RGB</div>
+            <div class="spec-value" id="spec-cooler">N/A</div>
           </div>
 
           <div class="spec-item">
@@ -146,7 +126,7 @@
               <span class="spec-dot"></span>
               <span>Boîtier / Alim</span>
             </div>
-            <div class="spec-value" id="spec-case">NZXT H7 Flow / 850W Gold</div>
+            <div class="spec-value" id="spec-case">N/A</div>
           </div>
         </div>
       </section>
@@ -181,7 +161,7 @@
                 <i data-lucide="check" class="check-icon"></i>
               </div>
               <div class="dropdown-item" data-value="alpha">
-                <i data-lucide="sort-asc" class="item-icon"></i>
+                <i data-lucide="arrow-down-a-z" class="item-icon"></i>
                 <span>Ordre alphabétique</span>
                 <i data-lucide="check" class="check-icon"></i>
               </div>
@@ -193,7 +173,7 @@
             </div>
             <input type="hidden" id="game-sort-select" value="recent">
           </div>
-          <button class="add-game-btn" id="open-add-game-btn" title="Ajouter un jeu au portfolio">
+          <button class="add-game-btn" id="open-add-game-btn" title="Ajouter un jeu au portfolio" style="display: none;">
             <i data-lucide="plus"></i>
             <span>Ajouter</span>
           </button>
