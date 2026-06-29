@@ -737,97 +737,37 @@ async function translateToFrench(text) {
 
 // Récupère les infos d'un jeu particulier via l'API ou le mock
 async function fetchGameInfo(slug) {
-  const isMock = !RAWG_API_KEY || RAWG_API_KEY === 'VOTRE_CLE_API_ICI';
   let myRating = MY_GAMES[slug]?.myRating || 'N/A';
   let dejaJoue = MY_GAMES[slug]?.dejaJoue || false;
   const myComment = MY_GAMES[slug]?.myComment || '';
-
   const addedAt = MY_GAMES[slug]?.addedAt || 0;
+  const customImage = MY_GAMES[slug]?.customImage || MY_GAMES[slug]?.background_image;
+  const customReleased = MY_GAMES[slug]?.released;
+  const customGenres = MY_GAMES[slug]?.genres;
+  const customPlatforms = MY_GAMES[slug]?.platforms;
 
-  // Migration de l'ancien format
   if (myRating === 'Déjà joué') {
     dejaJoue = true;
     myRating = 'N/A';
   }
-  
-  const customImage = MY_GAMES[slug]?.customImage;
-  const customReleased = MY_GAMES[slug]?.released;
-  const customGenres = MY_GAMES[slug]?.genres;
-  const customPlatforms = MY_GAMES[slug]?.platforms;
-  
-  if (isMock) {
-    // Simulation d'une latence réseau légère pour l'effet de chargement
-    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
-    const baseMock = MOCK_GAMES_DATA[slug] || generateFallbackMock(slug);
-    return {
-      slug: slug,
-      myRating: myRating,
-      dejaJoue: dejaJoue,
-      myComment: myComment,
-      addedAt: addedAt,
-      customImage: customImage,
-      platforms: customPlatforms || baseMock.platforms || 'PC, PS5, Xbox Series X/S',
-      released: customReleased || baseMock.released || 'N/A',
-      genres: customGenres || baseMock.genres || 'Action',
-      ...baseMock,
-      background_image: customImage || baseMock.background_image
-    };
-  }
 
-  try {
-    let data = null;
-    try {
-      const response = await fetch(`https://api.rawg.io/api/games/${slug}?key=322fb41e740644ecb0e5198b589351b6`);
-      if (response && response.ok) {
-        data = await response.json();
-      }
-    } catch(e) {}
+  const baseMock = MOCK_GAMES_DATA[slug] || generateFallbackMock(slug);
 
-    const baseMock = MOCK_GAMES_DATA[slug] || generateFallbackMock(slug);
-    const gameName = MY_GAMES[slug]?.name || data?.name || baseMock.name;
-    const gameBg = customImage || MY_GAMES[slug]?.background_image || data?.background_image || baseMock.background_image;
-    const gameRating = data?.rating || baseMock.rating || '4.5';
-    const gameReleased = customReleased || (data?.released ? new Date(data.released).getFullYear() : baseMock.released);
-    const gameGenres = customGenres || (data?.genres ? data.genres.map(g => g.name).join(', ') : baseMock.genres);
-    const gamePlatforms = customPlatforms || (data?.platforms ? data.platforms.map(p => p.platform.name).join(', ') : baseMock.platforms);
-    let gameDesc = baseMock.description;
-    if (data?.description) {
-      const cleaned = cleanHtmlDescription(data.description);
-      gameDesc = extractFrenchDescription(cleaned) || cleanDescriptionOfOtherLanguages(cleaned);
-    }
-
-    return {
-      slug: slug,
-      myRating: myRating,
-      dejaJoue: dejaJoue,
-      myComment: myComment,
-      addedAt: addedAt,
-      customImage: customImage,
-      name: gameName,
-      background_image: gameBg,
-      rating: gameRating,
-      released: gameReleased,
-      genres: gameGenres,
-      platforms: gamePlatforms,
-      description: gameDesc
-    };
-  } catch (err) {
-    const baseMock = MOCK_GAMES_DATA[slug] || generateFallbackMock(slug);
-    return {
-      slug: slug,
-      myRating: myRating,
-      dejaJoue: dejaJoue,
-      myComment: myComment,
-      addedAt: addedAt,
-      name: MY_GAMES[slug]?.name || baseMock.name,
-      background_image: customImage || MY_GAMES[slug]?.background_image || baseMock.background_image,
-      rating: '4.5',
-      released: 'N/A',
-      genres: 'Jeux',
-      platforms: 'PC',
-      description: 'Détails du jeu.'
-    };
-  }
+  return {
+    slug: slug,
+    myRating: myRating,
+    dejaJoue: dejaJoue,
+    myComment: myComment,
+    addedAt: addedAt,
+    customImage: customImage,
+    name: MY_GAMES[slug]?.name || baseMock.name,
+    background_image: customImage || baseMock.background_image,
+    rating: MY_GAMES[slug]?.rating || baseMock.rating || '4.5',
+    released: customReleased || baseMock.released || 'N/A',
+    genres: customGenres || baseMock.genres || 'Action',
+    platforms: customPlatforms || baseMock.platforms || 'PC',
+    description: MY_GAMES[slug]?.description || baseMock.description
+  };
 }
 
 // Supprime les balises HTML des descriptions RAWG
